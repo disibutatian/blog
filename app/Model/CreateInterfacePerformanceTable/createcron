@@ -1,0 +1,1 @@
+*/1 * * * *    curl 123.57.215.86/produce/inerfacePerformanceData  > /home/zhoupengcheng/echo.log

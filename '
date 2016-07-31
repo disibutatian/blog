@@ -1,0 +1,71 @@
+<?php
+namespace App\Model\SqlPacket;    
+
+use DB;
+use App\Model\SqlPacket\baseTable;
+
+class InterfacePerfomanceTable extends BaseTable
+{
+    public static $table = null;
+    public function __construct($table) 
+    {
+        self::$table = $table;
+        parent::__construct();
+        parent::$table = self::$table; 
+    }
+    //这个作为返回所有数据的统一接口
+    public function getPerformanceByProjectId($project_id, $timespan)
+    {
+        date_default_timezone_set('PRC');
+        $interval = 30;                 //这个粒度是固定的
+        $now = time();
+        
+        $start= $now - ($timespan * 60 * 4 );
+        $end = $now;
+        $start = date('Y-m-d H:i:s',$start);      //这种时间区间也可以直接比较搜索
+        $end = date('Y-m-d H:i:s',$end);
+        //$result = DB::table(self::$table)->lists('response_time', 'error_rate', 'timestamp')
+                                         //->where('project_id', '=', $id_project);
+       // $result = DB::table(self::$table)->select(DB::raw('error_rate','timestamp'));
+                                         //->whereBetween('timestamp', [$start, $end])
+                                         //->where('project_id', '=', $id_project)
+                                         //->get();
+        //                                 ->orderBy('timestamp', 'desc')
+        //                                 ->get();
+        //echo var_dump($result);
+        $result = DB::select('select * from  interface_perfomance where project_id = ?
+           and timestamp between ? and ? order by timestamp  desc ', [$project_id,$start,$end]);
+            //and i_name like "%?%" and added_on between ? and ? order by ? desc ',
+                                 //[$p_id,$s_name,$b1,$b2,$i_name]); 
+                            //order by ? ?', [$p_id,$s_name,$b1,$b2,$i_name,$sort]); 
+        //echo var_dump($result);
+        return $result;
+       /* $times = 0;
+        foreach($result1 as $values)
+        {
+            $i_name = $values->i_name;
+            $status = $values->status;
+            if(array_key_exists ( $i_name, $arr1 ) )
+            {
+                $arr1[$i_name] += 1;                //记录该接口的响应次数
+        */
+        
+    }
+    //处理返回的基础信息
+    public function getProjectAffairsInfo($project_id, $timespan)
+    {
+         $result = $this->getPerformanceByProjectId($project_id, $timespan);
+         echo var_dump($result);
+
+    }
+    public function getErrorProb($project_id, $timespan)
+    {
+         //getPerformanceByProjectId($project_id, $timespan);
+         //echo "fads";
+         $result = $this->getPerformanceByProjectId($project_id, $timespan);
+         echo var_dump($result);
+
+    }
+     
+}
+?>
